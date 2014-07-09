@@ -9,6 +9,6 @@ class App < Sinatra::Application
   end
 
   get "/" do
-    "Hello"
+    erb :homepage
   end
 end
