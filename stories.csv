@@ -49,4 +49,3 @@ end
 74634456,"As a logged in user, when I view another user's comment and I click ""Spam"" then the comment is marked as ""Spam""","",5,"Aug 4, 2014","Aug 10, 2014",feature,2,unstarted,"Jul 8, 2014",,,Jeff Taggart,"A ""Spam"" comment shows up in RED",https://www.pivotaltracker.com/story/show/74634456,
 74634508,"As a logged in user, when I'm viewing my home page and I have a comment that's been marked as spam then I see a new section called ""Spam"" that has a list of all of my comments that have been marked as spam","",6,"Aug 11, 2014","Aug 17, 2014",feature,2,unstarted,"Jul 8, 2014",,,Jeff Taggart,"The ""Spam"" section on my homepage ONLY shows up if I have at least one spammy comment.",https://www.pivotaltracker.com/story/show/74634508,
 74634250,Life Goal,"",6,"Aug 11, 2014","Aug 17, 2014",release,,unstarted,"Jul 8, 2014",,,Jeff Taggart,,https://www.pivotaltracker.com/story/show/74634250,
-
