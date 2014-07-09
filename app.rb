@@ -38,8 +38,7 @@ class App < Sinatra::Application
 
   post "/register" do
     check_reg(params[:username], params[:password])
-
-    end
+  end
 
   post "/sessions" do
     session[:id] = (@database_connection.sql("SELECT id from users where username = '#{params[:username]}';"))
@@ -49,14 +48,15 @@ class App < Sinatra::Application
   private
 
   def check_reg(username, password)
-    if username == ""
+    if username == "" && password == ""
+      flash[:notice] = "Please enter a username and password"
+      redirect back
+    elsif username == ""
       flash[:notice] = "Please enter a username"
-      redirect "/register"
+      redirect back
     elsif password == ""
       flash[:notice] = "Please enter a password"
-      redirect "/register"
-      #go into database and return all of the usernames, which will give us an array of hashes
-      #pull out the names and if the names include username, throw an error
+      redirect back
     elsif (@database_connection.sql("SELECT username from users")).select {|user| user[:username] == username } == []
       @database_connection.sql("INSERT INTO users (username, password) VALUES ('#{params[:username]}', '#{params[:password]}')")
       flash[:notice] = "Thank you for registering"

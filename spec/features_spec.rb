@@ -1,7 +1,10 @@
 require 'spec_helper'
 
 def authenticate_user
+
   if fill_in('username', :with => '')
+    click_button "Register"
+    save_and_open_page
     expect(page).to have_content ("Please enter a username")
   elsif fill_in('password', :with => '')
     expect(page).to have_content ("Please enter a password")
@@ -50,7 +53,7 @@ end
 
 feature "user authenication" do
   scenario "if username or password fields are blank, flash message" do
-    visit "/regiser"
+    visit "/register"
 
     authenticate_user
   end
