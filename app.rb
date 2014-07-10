@@ -16,7 +16,12 @@ class App < Sinatra::Application
   get "/" do
     if session[:id]
       user_name
-      erb :logged_in, :locals=>{:user_name=>user_name}
+      if params[:sort_ascending]
+        list = registered_users_list.sort
+      elsif params[:sort_descending]
+        list = registered_users_list.sort.reverse
+      end
+      erb :logged_in, :locals=>{:user_name=>user_name, :list=> list}
     else
       erb :homepage
     end
@@ -76,8 +81,11 @@ class App < Sinatra::Application
   end
 
   def check_login(username, password)
-    if username == "" && password == ""
-      flash[:notice] = "Please enter a username and password"
+    if (@database_connection.sql("SELECT username from users")).select {|user_hash| user_hash['username'] == username } == []
+    flash[:notice] = "Username doesn't exist"
+    redirect back
+    elsif username == "" && password == ""
+      flash[:notice] = "Please enter a username. Please enter a password"
       redirect back
     elsif username == ""
       flash[:notice] = "Please enter a username"
@@ -85,13 +93,12 @@ class App < Sinatra::Application
     elsif password == ""
       flash[:notice] = "Please enter a password"
       redirect back
-    elsif (@database_connection.sql("SELECT username from users")).select {|user_hash| user_hash['username'] == username } == []
-      flash[:notice] = "Username doesn't exist"
-      redirect back
     elsif (@database_connection.sql("SELECT username, password from users")).select { |user_hash|
       user_hash['username'] == username && user_hash['password'] != password } != []
       flash[:notice] = "Password is incorrect"
       redirect back
+    else (@database_connection.sql("SELECT username, password from users")).select { |user_hash|
+      user_hash['username'] == username && user_hash['password'] == password } != []
     end
   end
 
