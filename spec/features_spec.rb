@@ -1,23 +1,8 @@
 require 'spec_helper'
+require_relative '../lib/database_connection'
 
-def authenticate_user
-
-  if fill_in('username', :with => '') && fill_in('password', :with => '')
-    click_button "Register"
-    expect(page).to have_content ("Please enter a username and password")
-  elsif fill_in('username', :with => '')
-    click_button "Register"
-    expect(page).to have_content ("Please enter a username")
-  elsif fill_in('password', :with => '')
-    click_button "Register"
-    expect(page).to have_content ("Please enter a password")
-  elsif fill_in('username', :with => 'username')
-    click_button "Register"
-    expect(page).to have_content ("That username is already taken")
-  else fill_in('username', :with=> 'username')
-    click_button "Register"
-    expect(page).to have_content ("Thank you for registering")
-  end
+before do
+    @database_connection.sql("INSERT INTO users (username, password) VALUES ('jess', 'password')")
 end
 
 feature "homepage" do
@@ -37,35 +22,52 @@ feature "register form" do
   end
 end
 
-# feature "registered" do
-#   scenario "click register then see welcome message on the homepage" do
-#     visit "/register"
-#
-#     click_button "Register"
-#     expect(page).to have_content ("Thank you for registering")
-#   end
-# end
-
-feature "login and Logout" do
-  scenario "fills in username and password and logs in" do
-    visit "/login"
-
-    expect(page).to have_content ("username password")
-
-    click_button "Log In"
-    expect(page).to have_content ("Welcome")
-
-    expect(page).to have_selector(:link_or_button, 'Log Out')
-  end
-end
-
-feature "user authenication" do
-  scenario "if username or password fields are blank, flash message" do
+feature "register authenication" do
+  scenario "input correct credentials" do
     visit "/register"
 
-    authenticate_user
+    fill_in('password', :with => '')
+    click_button "Register"
+    expect(page).to have_content ("Please enter a password")
+
+    visit "/register"
+
+    fill_in('username', :with => '')
+    click_button "Register"
+    expect(page).to have_content ("Please enter a username")
+
+    visit "/register"
+
+    fill_in('username', :with=> 'jess')
+    click_button "Register"
+    expect(page).to have_content ("That username is already taken")
+
+    visit "/register"
+
   end
 end
+
+
+feature "Log In and user authentication" do
+  scenario "Sign in with correct credentials" do
+    visit '/'
+
+    click_button "Log In"
+    expect(page).to have_button ("Log In")
+
+    fill_in ('username', :with => 'jess')
+    fill_in ('password', :with => 'password')
+    click_button "Log In"
+    expect(page).to have_content ("Welcome jess")
+
+  end
+end
+
+
+
+
+
+#write a test that shows list items exist for each registered user
 
 
 

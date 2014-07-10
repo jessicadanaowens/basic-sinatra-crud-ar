@@ -1,5 +1,10 @@
 <h1>Welcome, <%= user_name.capitalize %></h1>
 
+<h1>Registered Users</h1>
+<ul>
+  <%= registered_users_list %>
+</ul>
+
 <form method="get" action="/logout">
   <input type="submit" value="Log Out">
 </form>
