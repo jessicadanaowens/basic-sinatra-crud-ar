@@ -15,8 +15,8 @@ class App < Sinatra::Application
 
   get "/" do
     if session[:id]
-      name = @database_connection.sql("SELECT username from users where id = '#{session[:id].first.values.first.to_i}';")
-      erb :logged_in, :locals=>{:name=>name}
+      user_name
+      erb :logged_in, :locals=>{:user_name=>user_name}
     else
       erb :homepage
     end
@@ -41,11 +41,19 @@ class App < Sinatra::Application
   end
 
   post "/sessions" do
-    session[:id] = (@database_connection.sql("SELECT id from users where username = '#{params[:username]}';"))
-    redirect '/'
+      session[:id] = current_user['id'].to_i if current_user
+      redirect '/'
   end
 
   private
+
+  def current_user
+    (@database_connection.sql("SELECT * from users where username = '#{params[:username]}';")).first
+  end
+
+  def user_name
+    (@database_connection.sql("SELECT * from users where id = '#{session[:id]}';")).first['username']
+  end
 
   def check_reg(username, password)
     if username == "" && password == ""
@@ -57,17 +65,18 @@ class App < Sinatra::Application
     elsif password == ""
       flash[:notice] = "Please enter a password"
       redirect back
-    elsif (@database_connection.sql("SELECT username from users")).select {|user| user[:username] == username } == []
-      @database_connection.sql("INSERT INTO users (username, password) VALUES ('#{params[:username]}', '#{params[:password]}')")
+      puts "Yay I'm here"
+    elsif (@database_connection.sql("SELECT username from users")).select {|user_hash| user_hash['username'] == username } == []
+      @database_connection.sql("INSERT INTO users (username, password) VALUES ('#{ params[:username] }', '#{ params[:password] }')")
       flash[:notice] = "Thank you for registering"
-      redirect "/"
+      redirect  "/"
     else
       flash[:notice] = "That username is already taken"
-      redirect "/register"
+      redirect back
     end
   end
 
-  end
+end
 
 
 

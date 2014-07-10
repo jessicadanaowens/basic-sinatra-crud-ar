@@ -2,12 +2,21 @@ require 'spec_helper'
 
 def authenticate_user
 
-  if fill_in('username', :with => '')
+  if fill_in('username', :with => '') && fill_in('password', :with => '')
     click_button "Register"
-    save_and_open_page
+    expect(page).to have_content ("Please enter a username and password")
+  elsif fill_in('username', :with => '')
+    click_button "Register"
     expect(page).to have_content ("Please enter a username")
   elsif fill_in('password', :with => '')
+    click_button "Register"
     expect(page).to have_content ("Please enter a password")
+  elsif fill_in('username', :with => 'username')
+    click_button "Register"
+    expect(page).to have_content ("That username is already taken")
+  else fill_in('username', :with=> 'username')
+    click_button "Register"
+    expect(page).to have_content ("Thank you for registering")
   end
 end
 
@@ -28,15 +37,14 @@ feature "register form" do
   end
 end
 
-feature "registered" do
-  scenario "click register then see welcome message on the homepage" do
-    visit "/register"
-
-    click_button "Register"
-
-    expect(page).to have_content ("Thank you for registering")
-  end
-end
+# feature "registered" do
+#   scenario "click register then see welcome message on the homepage" do
+#     visit "/register"
+#
+#     click_button "Register"
+#     expect(page).to have_content ("Thank you for registering")
+#   end
+# end
 
 feature "login and Logout" do
   scenario "fills in username and password and logs in" do
