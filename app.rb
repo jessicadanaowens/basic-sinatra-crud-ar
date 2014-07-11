@@ -20,12 +20,18 @@ class App < Sinatra::Application
         list = registered_users_list.sort
       elsif params[:sort_descending]
         list = registered_users_list.sort.reverse
+      else
+        list = registered_users_list
       end
-      erb :logged_in, :locals=>{:user_name=>user_name, :list=> list}
+      erb :logged_in, :locals=>{:user_name=>user_name, :sorted_list=> list}
     else
       erb :homepage
     end
+  end
 
+  post "/delete" do
+    @database_connection.sql("DELETE FROM users WHERE username = '#{params[:delete_user_name]}'")
+    redirect '/'
   end
 
   get "/register" do
@@ -37,16 +43,16 @@ class App < Sinatra::Application
   end
 
   get "/logout" do
-    session.clear
+    session.delete(:id)
     redirect '/'
   end
 
   post "/register" do
-    if @database_connection.sql("SELECT * FROM users WHERE username = '#{params[:username]}'") != []
-      flash[:notice] = "Username is already taken."
-      redirect back
-    elsif params[:username] == "" || params[:password] == ""
+    if params[:username] == "" || params[:password] == ""
       flash[:notice] = "Please fill in all fields."
+      redirect back
+    elsif @database_connection.sql("SELECT * FROM users WHERE username = '#{params[:username]}'") != []
+      flash[:notice] = "Username is already taken."
       redirect back
     end
 
@@ -64,11 +70,13 @@ class App < Sinatra::Application
   private
 
   def current_user
-    (@database_connection.sql("SELECT * from users where username = '#{params[:username]}';")).first
+    user = (@database_connection.sql("SELECT * from users where username = '#{params[:username]}';"))
+    user.first unless user == []
   end
 
   def user_name
-    (@database_connection.sql("SELECT * from users where id = '#{session[:id]}';")).first['username']
+    users = (@database_connection.sql("SELECT * from users where id = '#{session[:id]}';"))
+    users.first['username'] unless users == []
   end
 
   def check_login(username, password)
@@ -89,11 +97,14 @@ class App < Sinatra::Application
 
   def registered_users_list
     (@database_connection.sql("SELECT username from users")).map do |user_hash|
-      user_hash['username']
+      user_hash['username'] unless @database_connection.sql("SELECT * from users") == []
     end
   end
-
 end
+
+
+
+
 
 
 
