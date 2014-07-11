@@ -30,21 +30,23 @@ feature "register authenication" do
 
     fill_in('password', :with => '')
     click_button "Register"
-    expect(page).to have_content ("Please enter a password")
+    expect(page).to have_content ("Please fill in all fields")
 
     visit "/register"
 
     fill_in('username', :with => '')
     click_button "Register"
-    expect(page).to have_content ("Please enter a username")
+    expect(page).to have_content ("Please fill in all fields")
 
     visit "/register"
 
     fill_in('username', :with=> 'jess')
     click_button "Register"
-    expect(page).to have_content ("That username is already taken")
+    expect(page).to have_content ("Username is already taken")
 
     visit "/register"
+
+    #write test thank you for registering
 
   end
 end
@@ -59,7 +61,7 @@ feature "Log In and user authentication" do
     fill_in('username', :with => 'jess')
     fill_in('password', :with => 'password')
     click_button "Log In"
-    expect(page).to have_content ("Welcome, Jess Registered Users adam, bill ")
+    expect(page).to have_content ("Welcome, Jess Registered Users")
 
   end
 
@@ -68,21 +70,22 @@ feature "Log In and user authentication" do
 
     fill_in('password', :with => '')
     click_button "Log In"
-    expect(page).to have_content ("Please enter a password")
+    expect(page).to have_content ("Please fill in all fields")
 
     visit "/login"
 
     fill_in('username', :with => '')
     click_button "Log In"
-    expect(page).to have_content ("Please enter a username")
+    expect(page).to have_content ("Please fill in all fields")
 
     visit "/login"
 
-    fill_in('username', :with => 'bill')
+    fill_in('username', :with => 'oliver')
     click_button "Log In"
     expect(page).to have_content ("Username doesn't exist")
 
     visit "/login"
+
     fill_in('username', :with => 'jess')
     fill_in('password', :with => '456')
     click_button "Log In"

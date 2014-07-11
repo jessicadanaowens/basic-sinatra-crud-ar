@@ -10,13 +10,10 @@
 
 <h1>Registered Users</h1>
 
-<ul> <% list.each do |name| %>
-  <% unless name == user_name %>
-    <li><%= name %></li>
-  <% end %>
-  <% end %>
-</ul>
+
+
 
 <form method="get" action="/logout">
   <input type="submit" value="Log Out">
 </form>
+
