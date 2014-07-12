@@ -10,7 +10,6 @@ feature "homepage" do
 end
 
 feature "Registration and Login" do
-
   scenario "Form fields cannot be empty" do
 
     visit "/"
@@ -42,7 +41,7 @@ feature "Registration and Login" do
     click_button "Register"
     expect(page).to have_content ("Thank you for registering")
 
-    #add two registered users
+    #multiple users can register with different names
 
     click_button "Register"
     fill_in('username', :with => 'blake')
@@ -57,29 +56,60 @@ feature "Registration and Login" do
     expect(page).to have_content ("Thank you for registering")
 
     #user can login
+
     click_button "Log In"
     fill_in('username', :with => 'jess')
     fill_in('password', :with => '123')
     click_button "Log In"
 
     expect(page).to have_content("Welcome, jess")
-    expect(page).to_not have_selector('ul li', :text => 'jess')
-    expect(page).to have_content ("bill pam")
+    # expect(page).to_not have_selector('ul li', :text => 'jess')
+    expect(page).to have_content ("blake pam")
 
-    # click_button "Sort Users Ascending"
-    # expect(page).to have_selector('ul li:nth-child(1)', :text=>'adam')
-    #
-    # click_button "Sort Users Descending"
-    # expect(page).to have_selector('ul li:nth-child(1)', :text=>'jess')
+    #user can sort users and delete users on the logged_in page
 
-    fill_in('delete_user_name', :with => "bill")
+    click_button "Sort Users Ascending"
+    expect(page).to have_selector('ul li:nth-child(1)', :text=>'blake')
+
+    click_button "Sort Users Descending"
+    expect(page).to have_selector('ul li:nth-child(1)', :text=>'pam')
+
+    fill_in('delete_user_name', :with => "blake")
     click_button "Delete"
-    expect(page).to_not have_content ("bill")
+    expect(page).to_not have_content ("blake")
+
+    #user can create fish on the logged_in page
+
+    fill_in('fish name', :with => "shark")
+    fill_in('fish wiki', :with => "http://en.wikipedia.org/wiki/Shark")
+    click_button "Create"
+
+    find_link('shark').visible?
+
+    #user can log out on the logged_in page
 
     click_button "Log Out"
-    expect_page.to have_button("Login")
+    expect(page).to have_button("Log In")
 
-    # username validation
+    #user can't see fish created by other users on the logged_in page
+
+    click_button "Log In"
+    fill_in('username', :with => 'pam')
+    fill_in('password', :with => '123')
+    click_button "Log In"
+
+    expect(page).to_not have_content ("shark")
+
+    #user can click on another user on the logged_in page and see that user's fish
+
+    click_link('jess')
+    expect(page).to have_content("fish created by jess")
+    find_link('shark').visible?
+
+    click_button "Log Out"
+
+    # user can't register a name that's already taken
+
     click_button "Register"
 
     fill_in('username', :with => 'jess')
@@ -88,7 +118,7 @@ feature "Registration and Login" do
     expect(page).to have_content ("Username is already taken")
 
 
-    # correct and incorrect login credentials
+    # user can't log in with incorrect login credentials
 
     visit "/login"
 
@@ -105,6 +135,7 @@ feature "Registration and Login" do
     visit "/login"
 
     fill_in('username', :with => 'oliver')
+    fill_in('password', :with => 'password')
     click_button "Log In"
     expect(page).to have_content ("Username doesn't exist")
 
@@ -114,9 +145,10 @@ feature "Registration and Login" do
     fill_in('password', :with => '456')
     click_button "Log In"
     expect(page).to have_content ("Password is incorrect")
-    end
+
   end
 end
+
 
 
 

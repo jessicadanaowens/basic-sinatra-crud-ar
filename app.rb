@@ -23,7 +23,7 @@ class App < Sinatra::Application
       else
         list = registered_users_list
       end
-      erb :logged_in, :locals=>{:user_name=>user_name, :sorted_list=> list}
+      erb :logged_in, :locals=>{:user_name=>user_name, :sorted_list=> list, :user_fish_hash=> user_fish_hash}
     else
       erb :homepage
     end
@@ -62,9 +62,19 @@ class App < Sinatra::Application
   end
 
   post "/sessions" do
-      check_login(params[:username], params[:password])
-      session[:id] = current_user['id'].to_i if current_user
-      redirect '/'
+    check_login(params[:username], params[:password])
+    session[:id] = current_user['id'].to_i if current_user
+    redirect '/'
+  end
+
+  post "/createfish" do
+    @database_connection.sql("INSERT INTO fish (users_id, fish_name, fish_wiki_url) VALUES ('#{session[:id]}', '#{params[:fish_name]}', '#{params[:fish_wiki]}')")
+    redirect '/'
+  end
+
+  get "/:username" do
+    username = params[:username]
+    erb :username, :locals=>{:user=>username}
   end
 
   private
@@ -79,27 +89,31 @@ class App < Sinatra::Application
     users.first['username'] unless users == []
   end
 
-  def check_login(username, password)
-    if (@database_connection.sql("SELECT username from users")).select {|user_hash| user_hash['username'] == username } == []
-    flash[:notice] = "Username doesn't exist"
-    redirect back
-    elsif username == "" || password == ""
-      flash[:notice] = "Please fill in all fields"
-      redirect back
-    elsif (@database_connection.sql("SELECT username, password from users")).select { |user_hash|
-      user_hash['username'] == username && user_hash['password'] != password } != []
-      flash[:notice] = "Password is incorrect"
-      redirect back
-    # else (@database_connection.sql("SELECT username, password from users")).select { |user_hash|
-    #   user_hash['username'] == username && user_hash['password'] == password } != []
-    end
-  end
-
   def registered_users_list
     (@database_connection.sql("SELECT username from users")).map do |user_hash|
       user_hash['username'] unless @database_connection.sql("SELECT * from users") == []
     end
   end
+
+  def check_login(username, password)
+    if username == "" || password == ""
+    flash[:notice] = "Please fill in all fields"
+    redirect back
+    elsif (@database_connection.sql("SELECT username from users")).select {|user_hash| user_hash['username'] == username } == []
+      flash[:notice] = "Username doesn't exist"
+      redirect back
+    elsif (@database_connection.sql("SELECT username, password from users")).select { |user_hash|
+      user_hash['username'] == username && user_hash['password'] != password } != []
+      flash[:notice] = "Password is incorrect"
+      redirect back
+    end
+  end
+
+  def user_fish_hash
+    fishhash = @database_connection.sql("SELECT * FROM fish WHERE users_id = '#{session[:id]}';")
+    fishhash unless fishhash == []
+  end
+
 end
 
 

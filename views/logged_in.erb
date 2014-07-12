@@ -12,7 +12,7 @@
 <ul>
   <% sorted_list.each do |username| %>
     <% unless username == user_name %>
-      <li> <%= username %> </li>
+      <li> <a href="/<%= username %>"> <%= username %> </a></li>
     <% end %>
   <% end %>
 </ul>
@@ -20,11 +20,36 @@
 <form method="post" action="/delete">
   <ul>
     <li>
-      <label for="user name">Type User Name</label>
+      <label for="delete_user_name">Type User Name</label>
       <input type="text" name="delete_user_name" id="delete_user_name"/>
     </li>
     <li>
       <input type="submit" value="Delete" />
+    </li>
+  </ul>
+</form>
+
+<h1>Create a fish</h1>
+<ul>
+<% unless user_fish_hash == nil %>
+  <% user_fish_hash.each do |fish| %>
+    <li> <a href="<%=fish['fish_wiki_url']%>"> <%= fish['fish_name'] %> </a> </li>
+  <% end %>
+<% end %>
+</ul>
+
+<form method="post" action="/createfish">
+  <ul>
+    <li>
+      <label for="fish_name">fish name</label>
+      <input type="text" name="fish_name" id="fish_name"/>
+    </li>
+    <li>
+      <label for="fish_wiki">fish wiki</label>
+      <input type="text" name="fish_wiki" id="fish_wiki"/>
+    </li>
+    <li>
+      <input type="submit" value="Create" />
     </li>
   </ul>
 </form>
