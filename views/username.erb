@@ -1,1 +1,9 @@
 <h1>fish created by <%= user %> </h1>
+
+<ul>
+  <% if fish_array %>
+    <% fish_array.each do |fish| %>
+      <li> <a href="<%=fish['fish_wiki_url']%>"> <%= fish['fish_name'] %> </a> </li>
+    <% end %>
+  <% end %>
+</ul>

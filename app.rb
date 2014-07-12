@@ -73,8 +73,9 @@ class App < Sinatra::Application
   end
 
   get "/:username" do
-    username = params[:username]
-    erb :username, :locals=>{:user=>username}
+    other_user_id = (@database_connection.sql("SELECT id from users where username = '#{params[:username].to_s}';").first)['id']
+    fish_array = other_user_fishes(other_user_id)
+    erb :username, :locals=>{:user=>params[:username].to_s, :fish_array=>fish_array}
   end
 
   private
@@ -111,6 +112,11 @@ class App < Sinatra::Application
 
   def user_fish_hash
     fishhash = @database_connection.sql("SELECT * FROM fish WHERE users_id = '#{session[:id]}';")
+    fishhash unless fishhash == []
+  end
+
+  def other_user_fishes(id)
+    fishhash = @database_connection.sql("SELECT fish_name, fish_wiki_url FROM fish WHERE users_id = '#{id}';")
     fishhash unless fishhash == []
   end
 
