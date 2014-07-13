@@ -3,7 +3,30 @@
 <ul>
   <% if fish_array %>
     <% fish_array.each do |fish| %>
-      <li> <a href="<%=fish['fish_wiki_url']%>"> <%= fish['fish_name'] %> </a> </li>
+      <% favorite_fish.each do |favorite_fish_hash| %>
+        <% if fish['id'] == favorite_fish_hash['fish_id'] %>
+          <li><a href="<%= fish['fish_wiki_url'] %>"> <%= fish['fish_name'] %> </a></li>
+          <form method="get" action="/remove_favorite_fish">
+            <input type="submit" value="favorited" name="
+              <% fish['id'] %>"/>
+          </form>
+        <% else
+             <li> <a href="<%= fish['fish_wiki_url']   %>"> <%= fish['fish_name'] %> </a> </li>
+          <form method="get" action="/add_favorite_fish">
+            <input type="submit" value="favorite" name="
+              <% fish['id'] %>"/>
+          </form>
+        <% end %>
+      <% end %>
     <% end %>
   <% end %>
 </ul>
+
+<a href="/">Back</a>
+
+#iterate through fish_array, if the fish is in the favorite fish table, show the favorited form
+#else show the favorite form
+
+#create table favorite fish with userid
+#if params[:favorite_fish], add the fish into the favorite table
+#join fish_array with favorite fish table

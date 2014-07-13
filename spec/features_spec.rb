@@ -80,7 +80,22 @@ feature "Registration and Login" do
 
     #user can create fish on the logged_in page
 
-    fill_in('fish name', :with => "shark")
+    fill_in('fish_name', :with => "shark")
+    fill_in('fish wiki', :with => "http://en.wikipedia.org/wiki/Shark")
+    click_button "Create"
+
+    find_link('shark').visible?
+
+    #user can delete fish they created on logged in page
+
+    fill_in('delete_fish', :with => "shark")
+    click_button "Remove fish"
+
+    expect(page).to_not have_link ("shark")
+
+    #user can recreate the same fish
+
+    fill_in('fish_name', :with => "shark")
     fill_in('fish wiki', :with => "http://en.wikipedia.org/wiki/Shark")
     click_button "Create"
 
@@ -105,11 +120,14 @@ feature "Registration and Login" do
     click_link('jess')
     expect(page).to have_content("fish created by jess")
     find_link('shark').visible?
+    click_button "favorite"
 
-    click_button "Log Out"
+    expect(page).to have_link ("favorited")
+
+    click_link "Back"
 
     # user can't register a name that's already taken
-
+    click_button "Log Out"
     click_button "Register"
 
     fill_in('username', :with => 'jess')
