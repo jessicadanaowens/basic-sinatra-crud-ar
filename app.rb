@@ -80,18 +80,17 @@ class App < Sinatra::Application
   get "/:username" do
 
     other_user_id = (@database_connection.sql("SELECT id from users where username = '#{params[:username].to_s}';")).first['id']
-    other_user_fish_array = other_user_fishes(other_user_id)
+    other_user_fish_array = other_user_fishes(other_user_id) unless other_user_fishes(other_user_id) == []
     erb :username, :locals=>{:user=>params[:username].to_s, :fish_array=>other_user_fish_array}
   end
 
-  get "/add_favorite_fish" do
-    @database_connection.sql("INSERT INTO favorite_fish (fish_id, users_id) VALUES ('#{params[fish['id']]}', '#{session[:id]}')")
+  post "/add_favorite_fish/:fish" do
+    @database_connection.sql("INSERT INTO favorite_fish (fish_id, users_id) VALUES ('#{params[:fish]}', '#{session[:id]}')")
     redirect "/"
-    #how do I get back to the right /:username? i don't have access to the params that was created on logged_in page
   end
 
-  get "/remove_favorite_fish" do
-    @database_connection.sql("DELETE FROM favorite_fish where fish_id = '#{params[fish['id']]}';")
+  post "/remove_favorite_fish/:fish" do
+    @database_connection.sql("DELETE FROM favorite_fish where fish_id = '#{params[:fish]}';")
     redirect "/"
   end
 
@@ -139,6 +138,12 @@ class App < Sinatra::Application
 
   def favorite_fish
     @database_connection.sql("SELECT * FROM favorite_fish WHERE users_id = '#{session[:id]}';")
+  end
+
+  def favorite_fish_ids
+    favorite_fish.map do |fish|
+      fish['id']
+    end
   end
 
 end
