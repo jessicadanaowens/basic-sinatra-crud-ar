@@ -1,21 +1,23 @@
 <h1>fish created by <%= user %> </h1>
 
+<% if fish_array %>
+  <% fish_array.each do |fish_hash| %>
+    <% if favorite_fish_ids.include?(fish_hash['id']) %>
+      <li> <a href="<%= fish_hash['fish_wiki_url'] %>"> <%= fish_hash['fish_name'] %></a> </li>
+      <form method="post" action="/remove_favorite_fish/<%=fish_hash['id'] %>">
+        <input type="submit" value="delete from favorites" />
+      </form>
 
-<% favorite_fish_ids %>
 
-<% fish_array.each do |fish_hash| %>
-  <% if favorite_fish_ids.include?(fish_hash['id']) %>
-    <li> <a href="<%= fish_hash['fish_wiki_url'] %>"> <%= fish_hash['fish_name'] %> </a> </li>
-    <form method="post" action="/remove_favorite_fish/<%=fish_hash['id'] %>">
-      <input type="submit" value="favorited"/>
-    </form>
-
-  <% else %>
-    <li> <a href="<%= fish_hash['fish_wiki_url'] %>"> <%= fish_hash['fish_name'] %> </a> </li>
-    <form method="post" action="/add_favorite_fish/<%=fish_hash['id']%>" >
-      <input type="submit" value="favorite"/>
-    </form>
+    <% else %>
+      <li> <a href="<%= fish_hash['fish_wiki_url'] %>"> <%= fish_hash['fish_name'] %> </a> </li>
+      <form method="post" action="/add_favorite_fish/<%=fish_hash['id']%>" >
+        <input type="submit" value="add to favorites" />
+      </form>
+    <% end %>
   <% end %>
 <% end %>
 
-<a href="/">Back</a>
+
+
+<a href="/"> Back </a>

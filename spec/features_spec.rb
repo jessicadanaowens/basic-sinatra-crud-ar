@@ -122,9 +122,10 @@ feature "Registration and Login" do
     find_link('shark').visible?
     click_button "favorite"
 
-    expect(page).to have_link ("favorited")
+    expect(page).to have_content ("Welcome")
 
-    click_link "Back"
+    click_link('jess')
+    click_button "favorited"
 
     # user can't register a name that's already taken
     click_button "Log Out"

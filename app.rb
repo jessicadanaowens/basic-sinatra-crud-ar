@@ -81,16 +81,17 @@ class App < Sinatra::Application
 
     other_user_id = (@database_connection.sql("SELECT id from users where username = '#{params[:username].to_s}';")).first['id']
     other_user_fish_array = other_user_fishes(other_user_id) unless other_user_fishes(other_user_id) == []
+    other_user_fish_array ||= nil
     erb :username, :locals=>{:user=>params[:username].to_s, :fish_array=>other_user_fish_array}
   end
 
   post "/add_favorite_fish/:fish" do
-    @database_connection.sql("INSERT INTO favorite_fish (fish_id, users_id) VALUES ('#{params[:fish]}', '#{session[:id]}')")
+    @database_connection.sql("INSERT INTO favorite_fish (fish_id, users_id) VALUES (#{params[:fish].to_i}, '#{session[:id]}')")
     redirect "/"
   end
 
   post "/remove_favorite_fish/:fish" do
-    @database_connection.sql("DELETE FROM favorite_fish where fish_id = '#{params[:fish]}';")
+    @database_connection.sql("DELETE FROM favorite_fish where fish_id = #{params[:fish]};")
     redirect "/"
   end
 
@@ -127,22 +128,22 @@ class App < Sinatra::Application
   end
 
   def user_fish_hash
-    fishhash = @database_connection.sql("SELECT * FROM fish WHERE users_id = '#{session[:id]}';")
+    fishhash = @database_connection.sql("SELECT * FROM fish WHERE users_id = #{session[:id]};")
     fishhash unless fishhash == []
   end
 
   def other_user_fishes(id)
-    fishhash = @database_connection.sql("SELECT * FROM fish WHERE users_id = '#{id}';")
+    fishhash = @database_connection.sql("SELECT * FROM fish WHERE users_id = #{id};")
     fishhash unless fishhash == []
   end
 
   def favorite_fish
-    @database_connection.sql("SELECT * FROM favorite_fish WHERE users_id = '#{session[:id]}';")
+    @database_connection.sql("SELECT * FROM favorite_fish WHERE users_id = #{session[:id]};")
   end
 
   def favorite_fish_ids
     favorite_fish.map do |fish|
-      fish['id']
+      fish['fish_id']
     end
   end
 
